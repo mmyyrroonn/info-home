@@ -31,11 +31,27 @@ const pageCount = 50;
 const scores = [9,7,5,0];
 const score = ref(5);
 
+const sort = ref({
+  column: 'score',
+  direction: 'desc'
+})
+
+const sortFunctions = {
+  score: {
+    asc: (a, b) => a.score - b.score,
+    desc: (a, b) => b.score - a.score
+  },
+  createAt: {
+    asc: (a, b) => new Date(a.createAt) - new Date(b.createAt),
+    desc: (a, b) => new Date(b.createAt) - new Date(a.createAt)
+  }
+};
+
 const filtered_twitter = computed(() => {
   const limitScore = score.value?score.value:0;
   return twitters.filter((twitter) => {
     return twitter.score > limitScore;
-  });
+  }).sort(sortFunctions[sort.value.column][sort.value.direction]);
 });
 
 const rows = computed(() => {
@@ -57,7 +73,7 @@ const rows = computed(() => {
               <UPagination v-model="page" :page-count="pageCount" :total="filtered_twitter.length" />
           </div>
         </div>
-      <UTable :columns="columns" :rows="rows" :sort="{ column: 'score', direction: 'desc' }">
+      <UTable v-model:sort="sort" :columns="columns" :rows="rows">
       <template #linkToTweet-data="{ row }">
         <a v-bind:href="row.linkToTweet">
           <div class="w-[100rem]">
