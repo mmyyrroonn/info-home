@@ -2,11 +2,11 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
-  modules: ['@nuxt/ui'],
+  modules: ['@nuxt/ui','@element-plus/nuxt'],
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
-  },
+  }
 })
