@@ -10,18 +10,15 @@ const columns = [
     key: "score",
     label: "Score",
     sortable: true,
-    class: "w-1/6"
   },
   {
     key: "linkToTweet",
     label: "Content",
-    class: "w-auto"
   },
   {
     key: "createAt",
     label: "Time",
     sortable: true,
-    class: "w-1/6"
   },
 ];
 
@@ -66,10 +63,19 @@ const formatDate = (twitter) => {
 const rows = computed(() => {
   return filtered_twitter.value.slice((page.value - 1) * pageCount, (page.value) * pageCount).map(formatDate);
 });
+
+const contentWidth = computed(() => {
+  const browserWidth = window.innerWidth;
+  const rootFontSizePx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  const contentWidthRem = parseInt((browserWidth - 300) / rootFontSizePx);
+  const contentWidthRemString = `w-[${contentWidthRem}rem]`.toString();
+  console.log(contentWidthRemString);
+  return `w-[101rem]`;
+})
 </script>
 
 <template>
-    <div class="flex place-content-center">
+    <div class="flex place-content-evenly">
       <div>
         <div class="flex justify-between">
           <div class="flex left-component">
@@ -90,7 +96,7 @@ const rows = computed(() => {
       <UTable v-model:sort="sort" :columns="columns" :rows="rows">
       <template #linkToTweet-data="{ row }">
         <a v-bind:href="row.linkToTweet">
-          <div class="w-[100rem]">
+          <div :class="contentWidth">
             <p class="truncate ..."> {{row.text}} </p>
           </div>
         </a>
