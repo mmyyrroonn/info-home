@@ -93,15 +93,27 @@ const contentWidth = computed(() => {
               <UPagination v-model="page" :page-count="pageCount" :total="filtered_twitter.length" />
           </div>
         </div>
-      <UTable v-model:sort="sort" :columns="columns" :rows="rows">
+      <!-- <UTable v-model:sort="sort" :columns="columns" :rows="rows">
       <template #linkToTweet-data="{ row }">
         <a v-bind:href="row.linkToTweet">
-          <div :class="contentWidth">
-            <p class="truncate ..."> {{row.text}} </p>
+          <div class="w-[101rem]">
+            <p class="flex truncate ..."> {{row.text}} </p>
           </div>
         </a>
       </template>
-      </UTable>
+      </UTable> -->
+
+      <el-table :data="rows" v-fit-columns>
+        <el-table-column prop="score" label="Score"></el-table-column>
+        <el-table-column prop="text" label="Content">
+          <template v-slot:default="table">
+            <a v-bind:href="table.row.linkToTweet">
+              <p class="flex truncate ..."> {{table.row.text}} </p>
+            </a>
+         </template>
+        </el-table-column>
+        <el-table-column prop="createAt" label="Time"></el-table-column>
+      </el-table>
       </div>
     </div>
 

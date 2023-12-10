@@ -6141,6 +6141,11 @@ util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
 
+v-fit-columns@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/v-fit-columns/-/v-fit-columns-0.2.0.tgz#4d75b0eb66fcd701025044f356cc00e8d6fec7a2"
+  integrity sha512-xR0jIFmTyJeg4VZgEx7z8BIijZnHQegtbwAhG3L3TmyAoq/TXk7H6vzFLNxAVzOj9pSpO/0B2mf7jmuO2nE4Ag==
+
 validate-npm-package-license@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/validate-npm-package-license/-/validate-npm-package-license-3.0.4.tgz#fc91f6b9c7ba15c857f4cb2c5defeec39d4f410a"
