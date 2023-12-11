@@ -38,7 +38,6 @@ var sort = ref({
 
 function updateSortData(data)
 {
-  console.log(data);
   sort.value.prop = data.prop;
   sort.value.order = data.order;
 };
@@ -71,10 +70,18 @@ const rows = computed(() => {
   return filtered_twitter.value.slice((page.value - 1) * pageCount, (page.value) * pageCount).map(formatDate);
 });
 
-const contentWidth = computed(() => {
-  return parseInt((window.innerWidth - 290));
-  // return "500";
-})
+const columnsWidth = computed(() => {
+  const innerWidth = window.innerWidth;
+  const isPhone = innerWidth < 600;
+  if(isPhone) {
+    return { score: 70, text: parseInt((window.innerWidth - 230)), createAt: 130};
+  }
+  return { score: 110, text: parseInt((window.innerWidth - 270)), createAt: 130};
+});
+
+const contentClass = computed(() => {
+    return window.innerWidth < 600?"":"whitespace-nowrap truncate ...";
+});
 </script>
 
 <template>
@@ -107,15 +114,15 @@ const contentWidth = computed(() => {
       </UTable> -->
 
       <el-table fit :data="rows" @sort-change="updateSortData">
-        <el-table-column prop="score" label="Score" width="110" sortable="custom"></el-table-column>
-        <el-table-column prop="text" label="Content" :width="contentWidth">
+        <el-table-column prop="score" label="Score" :width="columnsWidth.score" sortable="custom"></el-table-column>
+        <el-table-column prop="text" label="Content" :width="columnsWidth.text">
           <template v-slot:default="table">
             <a v-bind:href="table.row.linkToTweet">
-              <p class="whitespace-nowrap truncate ..."> {{table.row.text}} </p>
+              <p :class="contentClass"> {{table.row.text}} </p>
             </a>
          </template>
         </el-table-column>
-        <el-table-column prop="createAt" label="Time" width="150" sortable="custom"></el-table-column>
+        <el-table-column prop="createAt" label="Time" :width="columnsWidth.createAt" sortable="custom"></el-table-column>
       </el-table>
       </div>
     </div>
