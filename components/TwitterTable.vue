@@ -74,9 +74,10 @@ const columnsWidth = computed(() => {
   const innerWidth = window.innerWidth;
   const isPhone = innerWidth < 600;
   if(isPhone) {
-    return { score: 70, text: parseInt((window.innerWidth - 180)), createAt: 60};
+    const minWidth = innerWidth < 429?429:innerWidth;
+    return { score: 70, text: parseInt((minWidth - 140)), createAt: 60};
   }
-  return { score: 110, text: parseInt((window.innerWidth - 270)), createAt: 130};
+  return { score: 110, text: parseInt((window.innerWidth - 260)), createAt: 130};
 });
 
 const contentClass = computed(() => {
