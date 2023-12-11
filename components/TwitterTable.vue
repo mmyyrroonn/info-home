@@ -25,25 +25,32 @@ const columns = [
 const page = ref(1);
 const pageCount = 50;
 
-const scores = [9,7,5,0];
-const score = ref(5);
+const scores = [9,8,7,5,0];
+const score = ref(7);
 
 const dates = [1, 6, 12, 24, 48];
 const date = ref(24);
 
-const sort = ref({
-  column: 'score',
-  direction: 'desc'
-})
+var sort = ref({
+  prop: 'createAt',
+  order: 'descending'
+});
+
+function updateSortData(data)
+{
+  console.log(data);
+  sort.value.prop = data.prop;
+  sort.value.order = data.order;
+};
 
 const sortFunctions = {
   score: {
-    asc: (a, b) => a.score - b.score,
-    desc: (a, b) => b.score - a.score
+    ascending: (a, b) => a.score - b.score,
+    descending: (a, b) => b.score - a.score
   },
   createAt: {
-    asc: (a, b) => a.createAt - b.createAt,
-    desc: (a, b) => b.createAt - a.createAt
+    ascending: (a, b) => a.createAt - b.createAt,
+    descending: (a, b) => b.createAt - a.createAt
   }
 };
 
@@ -52,7 +59,7 @@ const filtered_twitter = computed(() => {
   const limitDate = new Date(Date.now() - (date.value?date.value:48) * 60 * 60 * 1000);
   return twitters.filter((twitter) => {
     return twitter.score > limitScore && twitter.createAt > limitDate;
-  }).sort(sortFunctions[sort.value.column][sort.value.direction]);
+  }).sort(sortFunctions[sort.value.prop][sort.value.order]);
 });
 
 const dateFormat = { hour: 'numeric', month: 'numeric', day: 'numeric', minute: 'numeric' };
@@ -65,17 +72,13 @@ const rows = computed(() => {
 });
 
 const contentWidth = computed(() => {
-  const browserWidth = window.innerWidth;
-  const rootFontSizePx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-  const contentWidthRem = parseInt((browserWidth - 300) / rootFontSizePx);
-  const contentWidthRemString = `w-[${contentWidthRem}rem]`.toString();
-  console.log(contentWidthRemString);
-  return `w-[101rem]`;
+  return parseInt((window.innerWidth - 290));
+  // return "500";
 })
 </script>
 
 <template>
-    <div class="flex place-content-evenly">
+    <div class="flex">
       <div>
         <div class="flex justify-between">
           <div class="flex left-component">
@@ -103,16 +106,16 @@ const contentWidth = computed(() => {
       </template>
       </UTable> -->
 
-      <el-table :data="rows" v-fit-columns>
-        <el-table-column prop="score" label="Score"></el-table-column>
-        <el-table-column prop="text" label="Content">
+      <el-table fit :data="rows" @sort-change="updateSortData">
+        <el-table-column prop="score" label="Score" width="110" sortable="custom"></el-table-column>
+        <el-table-column prop="text" label="Content" :width="contentWidth">
           <template v-slot:default="table">
             <a v-bind:href="table.row.linkToTweet">
-              <p class="flex truncate ..."> {{table.row.text}} </p>
+              <p class="whitespace-nowrap truncate ..."> {{table.row.text}} </p>
             </a>
          </template>
         </el-table-column>
-        <el-table-column prop="createAt" label="Time"></el-table-column>
+        <el-table-column prop="createAt" label="Time" width="150" sortable="custom"></el-table-column>
       </el-table>
       </div>
     </div>
