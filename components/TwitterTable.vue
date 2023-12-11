@@ -118,7 +118,7 @@ const contentClass = computed(() => {
         <el-table-column prop="score" label="Score" :width="columnsWidth.score" sortable="custom"></el-table-column>
         <el-table-column prop="text" label="Content" :width="columnsWidth.text">
           <template v-slot:default="table">
-            <a v-bind:href="table.row.linkToTweet">
+            <a v-bind:href="table.row.linkToTweet" target="_blank">
               <p :class="contentClass"> {{table.row.text}} </p>
             </a>
          </template>
