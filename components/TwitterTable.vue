@@ -74,7 +74,7 @@ const columnsWidth = computed(() => {
   const innerWidth = window.innerWidth;
   const isPhone = innerWidth < 600;
   if(isPhone) {
-    return { score: 70, text: parseInt((window.innerWidth - 230)), createAt: 130};
+    return { score: 70, text: parseInt((window.innerWidth - 180)), createAt: 60};
   }
   return { score: 110, text: parseInt((window.innerWidth - 270)), createAt: 130};
 });
