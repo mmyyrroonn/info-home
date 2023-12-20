@@ -5,23 +5,6 @@ const { data, pending, error, refresh } = await useFetch(
 const twitters = data.value.data.filter((obj) => obj.score != 0).map((twitter) => {
   return {...twitter, createAt: new Date(twitter.createAt.substring(0, 16))};
 });
-const columns = [
-  {
-    key: "score",
-    label: "Score",
-    sortable: true,
-  },
-  {
-    key: "linkToTweet",
-    label: "Content",
-  },
-  {
-    key: "createAt",
-    label: "Time",
-    sortable: true,
-  },
-];
-
 const page = ref(1);
 const pageCount = 50;
 
@@ -61,7 +44,7 @@ const filtered_twitter = computed(() => {
   }).sort(sortFunctions[sort.value.prop][sort.value.order]);
 });
 
-const dateFormat = { hour: 'numeric', month: 'numeric', day: 'numeric', minute: 'numeric' };
+const dateFormat = { hour: 'numeric', month: 'numeric', day: 'numeric', minute: 'numeric', hour12: false };
 const formatDate = (twitter) => {
   return {...twitter, createAt: twitter.createAt.toLocaleString('en-US', dateFormat)}
 }
@@ -72,17 +55,23 @@ const rows = computed(() => {
 
 const columnsWidth = computed(() => {
   const innerWidth = window.innerWidth;
-  const isPhone = innerWidth < 600;
-  if(isPhone) {
-    const minWidth = innerWidth < 429?429:innerWidth;
-    return { score: 70, text: parseInt((minWidth - 140)), createAt: 60};
+  if(isPhone.value) {
+    return { score: 70, text: parseInt((innerWidth - 140)), createAt: 60};
   }
-  return { score: 110, text: parseInt((window.innerWidth - 260)), createAt: 130};
+  return { score: 110, text: parseInt((innerWidth - 240)), createAt: 110};
 });
 
 const contentClass = computed(() => {
-    return window.innerWidth < 600?"":"whitespace-nowrap truncate ...";
+    return isPhone.value?"":"whitespace-nowrap truncate ...";
 });
+
+const isPhone = ref(false);
+onMounted(() => {
+  if(window.innerWidth<600) {
+    console.log("The device is phone")
+    isPhone.value = true;
+  }
+})
 </script>
 
 <template>
@@ -100,19 +89,15 @@ const contentClass = computed(() => {
             </div>
             <span class="flex items-center py-3.5">小时之内的推文</span>
           </div>
-          <div class="right-component justify-end px-3 py-3.5 dark:border-gray-700">
+          <!-- Pagenation Part-->
+          <div v-if="isPhone">
+          </div>
+          <div v-else>
+            <div class="right-component justify-end px-3 py-3.5 dark:border-gray-700">
               <UPagination v-model="page" :page-count="pageCount" :total="filtered_twitter.length" />
           </div>
-        </div>
-      <!-- <UTable v-model:sort="sort" :columns="columns" :rows="rows">
-      <template #linkToTweet-data="{ row }">
-        <a v-bind:href="row.linkToTweet">
-          <div class="w-[101rem]">
-            <p class="flex truncate ..."> {{row.text}} </p>
           </div>
-        </a>
-      </template>
-      </UTable> -->
+        </div>
 
       <el-table fit :data="rows" @sort-change="updateSortData">
         <el-table-column prop="score" label="Score" :width="columnsWidth.score" sortable="custom"></el-table-column>
@@ -125,6 +110,10 @@ const contentClass = computed(() => {
         </el-table-column>
         <el-table-column prop="createAt" label="Time" :width="columnsWidth.createAt" sortable="custom"></el-table-column>
       </el-table>
+
+      <div class="flex place-content-center px-3 py-3.5 dark:border-gray-700">
+          <UPagination v-model="page" :page-count="pageCount" :total="filtered_twitter.length" />
+      </div>
       </div>
     </div>
 
