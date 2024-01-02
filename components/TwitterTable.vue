@@ -36,6 +36,8 @@ const sortFunctions = {
   }
 };
 
+
+
 const filtered_twitter = computed(() => {
   const limitScore = score.value?score.value:0;
   const limitDate = new Date(Date.now() - (date.value?date.value:48) * 60 * 60 * 1000);
@@ -51,6 +53,13 @@ const formatDate = (twitter) => {
 
 const rows = computed(() => {
   return filtered_twitter.value.slice((page.value - 1) * pageCount, (page.value) * pageCount).map(formatDate);
+});
+
+watch(page, (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      // 当 page.value 改变时，滚动到页面顶部
+      window.scrollTo(0, 0);
+    }
 });
 
 const columnsWidth = computed(() => {
