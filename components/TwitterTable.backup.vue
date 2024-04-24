@@ -1,16 +1,18 @@
 <script setup>
+const { data, pending, error, refresh } = await useFetch(
+  "https://info.myron-moshui.online/twitter/queryLastDaySummary"
+);
+const twitters = data.value.data.filter((obj) => obj.score != 0).map((twitter) => {
+  return {...twitter, createAt: new Date(twitter.createAt.substring(0, 16))};
+});
 const page = ref(1);
 const pageCount = 50;
 
 const scores = [9,8,7,5,0];
-const score = ref(0);
+const score = ref(7);
 
-const dates = [1, 6, 12, 24, 48, 96];
-const date = ref(96);
-
-const query_text = ref('')
-const twitters = ref([]);
-const quering = ref(false);
+const dates = [1, 6, 12, 24, 48];
+const date = ref(24);
 
 var sort = ref({
   prop: 'createAt',
@@ -34,11 +36,13 @@ const sortFunctions = {
   }
 };
 
+
+
 const filtered_twitter = computed(() => {
   const limitScore = score.value?score.value:0;
   const limitDate = new Date(Date.now() - (date.value?date.value:48) * 60 * 60 * 1000);
-  return twitters.value.filter((twitter) => {
-    return twitter.score >= limitScore && twitter.createAt >= limitDate;
+  return twitters.filter((twitter) => {
+    return twitter.score > limitScore && twitter.createAt > limitDate;
   }).sort(sortFunctions[sort.value.prop][sort.value.order]);
 });
 
@@ -61,9 +65,9 @@ watch(page, (newValue, oldValue) => {
 const columnsWidth = computed(() => {
   const innerWidth = window.innerWidth;
   if(isPhone.value) {
-    return { score: 70, text: parseInt((innerWidth - 60)), createAt: 60};
+    return { score: 70, text: parseInt((innerWidth - 140)), createAt: 60};
   }
-  return { score: 110, text: parseInt((innerWidth - 110)), createAt: 110};
+  return { score: 110, text: parseInt((innerWidth - 240)), createAt: 110};
 });
 
 const contentClass = computed(() => {
@@ -77,55 +81,12 @@ onMounted(() => {
     isPhone.value = true;
   }
 })
-
-async function queryTwitter() {
-  quering.value = true;
-  const { data, pending, error, refresh } = await useFetch(
-      `https://info.myron-moshui.online/twitter/queryRelatedTwitter`,
-      {
-        method: "POST",
-        body: {
-          query_text: query_text.value,
-          limit: 100
-        }
-      });
-  // 处理得到的数据
-  if (data.value && data.value.data) {
-    twitters.value = data.value.data.map((twitter) => {
-      return {
-        ...twitter,
-        createAt: new Date(twitter.createAt.substring(0, 16)),
-        linkToTweet: "https://twitter.com/" + twitter.userName + "/status/" + twitter.tweetId
-      };
-    });
-  }
-  quering.value = false;
-  // console.log("Twitters: ", twitters);
-}
 </script>
 
 <template>
     <div class="flex">
       <div>
-        <div class="">
-      <div class="w-full mx-auto">
-        <el-form @submit.native.prevent="queryTwitter">
-          <div class="flex flex-col">
-            <el-form-item>
-              <el-input v-model="query_text" placeholder="搜索你想了解的币圈推特, 例如空投, 大饼走势"></el-input>
-            </el-form-item>
-            <div class="flex justify-end">
-            <el-form-item>
-              <el-button type="primary" native-type="submit" :loading="quering">
-                {{ quering ? '搜索中...' : '确认' }}
-              </el-button>
-            </el-form-item>
-            </div>
-          </div>
-          </el-form>
-        </div>
-      </div>
-          <div class="flex justify-between" v-if="false">
+        <div class="flex justify-between">
           <div class="flex left-component">
             <span class="flex items-center py-3.5">显示AI分析得分高于</span>
             <div class="py-3.5 dark:border-gray-700">
@@ -148,7 +109,7 @@ async function queryTwitter() {
         </div>
 
       <el-table fit :data="rows" @sort-change="updateSortData">
-        <el-table-column prop="score" label="Score" :width="columnsWidth.score" v-if="false"></el-table-column>
+        <el-table-column prop="score" label="Score" :width="columnsWidth.score" sortable="custom"></el-table-column>
         <el-table-column prop="text" label="Content" :width="columnsWidth.text">
           <template v-slot:default="table">
             <a v-bind:href="table.row.linkToTweet" target="_blank">
