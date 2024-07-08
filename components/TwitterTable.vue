@@ -102,6 +102,18 @@ async function queryTwitter() {
   quering.value = false;
   // console.log("Twitters: ", twitters);
 }
+
+function searchAirdrop() {
+  // 模拟搜索空投的逻辑
+  query_text.value = '空投 融资 作业 交互 撸毛';
+  queryTwitter();
+}
+
+function checkBitcoin() {
+  // 模拟搜索大饼走势的逻辑
+  query_text.value = '大饼走势 以太坊走势';
+  queryTwitter();
+}
 </script>
 
 <template>
@@ -114,6 +126,14 @@ async function queryTwitter() {
             <el-form-item>
               <el-input v-model="query_text" placeholder="搜索你想了解的币圈推特, 例如空投, 大饼走势"></el-input>
             </el-form-item>
+            <div class="flex justify-start">
+              <button @click="searchAirdrop" class="px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                空投交互
+              </button>
+              <button @click="checkBitcoin" class="px-4 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:bg-green-600">
+                币价走势
+              </button>
+            </div>
             <div class="flex justify-end">
             <el-form-item>
               <el-button type="primary" native-type="submit" :loading="quering">
