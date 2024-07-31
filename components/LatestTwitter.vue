@@ -122,7 +122,7 @@ async function handleReplyClick(row) {
           // 在桌面设备上，打开回复页面
           const replyText = encodeURIComponent(reply)
           const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${row.tweetId}&text=${replyText}`
-          openLink(getTweetUrl(row))
+          openLink(replyUrl)
         }
       } else {
         reply = '获取回复失败，请重试。'
