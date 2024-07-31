@@ -38,6 +38,23 @@ function isChineseOrEnglish(text) {
       }
     }
 
+function openTwitterLink(url) {
+  // 创建一个隐藏的 a 标签
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('target', '_blank');
+  link.style.display = 'none';
+  document.body.appendChild(link);
+
+  // 模拟点击链接
+  link.click();
+
+  // 清理 DOM
+  setTimeout(() => {
+    document.body.removeChild(link);
+  }, 100);
+}
+
 function updateSortData(data)
 {
   sort.value.prop = data.prop;
@@ -83,7 +100,8 @@ async function handleReplyClick(row) {
         // 生成回复链接并跳转
         const replyText = encodeURIComponent(reply)
         const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${row.tweetId}&text=${replyText}`
-        window.open(replyUrl, '_blank')
+        // 使用新的方法打开链接
+        openTwitterLink(replyUrl);
       } else {
         reply = '获取回复失败，请重试。'
       }
@@ -178,7 +196,7 @@ onMounted(() => {
             <a v-if="mode === 'normal'" :href="'https://x.com/' + table.row.userName + '/status/' + table.row.tweetId" target="_blank">
               <p :class="contentClass">{{ table.row.text }}</p>
             </a>
-            <div v-else @click="handleReplyClick(table.row)" class="cursor-pointer">
+            <div v-else @click.prevent="handleReplyClick(table.row)" class="cursor-pointer">
               <p :class="contentClass">{{ table.row.text }}</p>
             </div>
           </template>
