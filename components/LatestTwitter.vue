@@ -13,8 +13,7 @@ const dates = [1, 2, 3, 4, 5, 6];
 const date = ref(24);
 
 const language = ref("zh");
-const mode = ref('normal')
-const autoReplyComponent = ref(null)
+const mode = ref('normal');
 
 var sort = ref({
   prop: 'createAt',
@@ -81,6 +80,10 @@ function toggleMode() {
   mode.value = mode.value === 'normal' ? 'reply' : 'normal'
 }
 
+function getTweetUrl(row) {
+  return `https://twitter.com/${row.userName}/status/${row.tweetId}`
+}
+
 async function handleReplyClick(row) {
   if (mode.value === 'reply') {
     let reply;
@@ -98,10 +101,19 @@ async function handleReplyClick(row) {
       if (result.success) {
         reply = result.data.content
         // 生成回复链接并跳转
-        const replyText = encodeURIComponent(reply)
-        const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${row.tweetId}&text=${replyText}`
-        // 使用新的方法打开链接
-        openTwitterLink(replyUrl);
+        if (isPhone.value) {
+        // 在移动设备上，复制回复到剪贴板
+          console.log("ddd");
+          await navigator.clipboard.writeText(reply)
+          
+          // 跳转到原始推文
+          window.location.href = getTweetUrl(row)
+        } else {
+          // 在桌面设备上，打开回复页面
+          const replyText = encodeURIComponent(reply)
+          const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${row.tweetId}&text=${replyText}`
+          window.open(replyUrl, '_blank')
+        }
       } else {
         reply = '获取回复失败，请重试。'
       }
@@ -193,10 +205,10 @@ onMounted(() => {
       <el-table fit :data="rows" @sort-change="updateSortData">
         <el-table-column prop="text" label="Content" :width="columnsWidth.text">
           <template v-slot:default="table">
-            <a v-if="mode === 'normal'" :href="'https://x.com/' + table.row.userName + '/status/' + table.row.tweetId" target="_blank">
+            <a v-if="mode === 'normal'" :href="getTweetUrl(table.row)" target="_blank">
               <p :class="contentClass">{{ table.row.text }}</p>
             </a>
-            <div v-else @click.prevent="handleReplyClick(table.row)" class="cursor-pointer">
+            <div v-else @click="handleReplyClick(table.row)" class="cursor-pointer">
               <p :class="contentClass">{{ table.row.text }}</p>
             </div>
           </template>
