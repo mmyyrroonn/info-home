@@ -84,6 +84,16 @@ function getTweetUrl(row) {
   return `https://twitter.com/${row.userName}/status/${row.tweetId}`
 }
 
+function openLink(url) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 async function handleReplyClick(row) {
   if (mode.value === 'reply') {
     let reply;
@@ -107,12 +117,12 @@ async function handleReplyClick(row) {
           await navigator.clipboard.writeText(reply)
           
           // 跳转到原始推文
-          window.location.href = getTweetUrl(row)
+          openLink(getTweetUrl(row))
         } else {
           // 在桌面设备上，打开回复页面
           const replyText = encodeURIComponent(reply)
           const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${row.tweetId}&text=${replyText}`
-          window.open(replyUrl, '_blank')
+          openLink(getTweetUrl(row))
         }
       } else {
         reply = '获取回复失败，请重试。'
