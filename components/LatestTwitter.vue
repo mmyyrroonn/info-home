@@ -13,6 +13,8 @@ const dates = [1, 2, 3, 4, 5, 6];
 const date = ref(24);
 
 const language = ref("zh");
+const mode = ref('normal')
+const autoReplyComponent = ref(null)
 
 var sort = ref({
   prop: 'createAt',
@@ -57,6 +59,40 @@ function toggleLanguage() {
     }
     console.log(`new language value is ${language.value}`);
 };
+
+function toggleMode() {
+  mode.value = mode.value === 'normal' ? 'reply' : 'normal'
+}
+
+async function handleReplyClick(row) {
+  if (mode.value === 'reply') {
+    let reply;
+    try {
+      const response = await fetch('https://info.myron-moshui.online/openai/getReply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: row.text }),
+      })
+  
+      const result = await response.json()
+  
+      if (result.success) {
+        reply = result.data.content
+        // 生成回复链接并跳转
+        const replyText = encodeURIComponent(reply)
+        const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${row.tweetId}&text=${replyText}`
+        window.open(replyUrl, '_blank')
+      } else {
+        reply = '获取回复失败，请重试。'
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      reply = '发生错误，请稍后重试。'
+    }
+  }
+}
 
 const filtered_twitter = computed(() => {
   const limitDate = new Date(Date.now() - (date.value?date.value:48) * 60 * 60 * 1000);
@@ -114,10 +150,15 @@ onMounted(() => {
             <span class="flex items-center py-3.5">小时之内的推文</span>
           </div>
 
-          <!-- 切换按钮 -->
-          <div class="switch-language">
+          <!-- 按钮组 -->
+          <div class="flex space-x-4 mb-4">
+            <!-- 切换语言按钮 -->
             <button @click="toggleLanguage" class="px-3 py-1 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600">
               {{ language === 'zh' ? '切换为英文' : '切换为中文' }}
+            </button>
+            <!-- 切换模式按钮 -->
+            <button @click="toggleMode" class="px-3 py-1 text-white rounded-md shadow-md bg-amber-500 hover:bg-amber-600 text-white">
+              {{ mode === 'normal' ? '切换到回复模式' : '切换到普通模式' }}
             </button>
           </div>
           <!-- Pagenation Part-->
@@ -130,13 +171,17 @@ onMounted(() => {
           </div>
         </div>
 
+      <!-- Table -->
       <el-table fit :data="rows" @sort-change="updateSortData">
         <el-table-column prop="text" label="Content" :width="columnsWidth.text">
           <template v-slot:default="table">
-            <a v-bind:href="'https://x.com/' + table.row.userName + '/status/' + table.row.tweetId" target="_blank">
-              <p :class="contentClass"> {{table.row.text}} </p>
+            <a v-if="mode === 'normal'" :href="'https://x.com/' + table.row.userName + '/status/' + table.row.tweetId" target="_blank">
+              <p :class="contentClass">{{ table.row.text }}</p>
             </a>
-         </template>
+            <div v-else @click="handleReplyClick(table.row)" class="cursor-pointer">
+              <p :class="contentClass">{{ table.row.text }}</p>
+            </div>
+          </template>
         </el-table-column>
         <el-table-column prop="createAt" label="Time" :width="columnsWidth.createAt" sortable="custom"></el-table-column>
       </el-table>
