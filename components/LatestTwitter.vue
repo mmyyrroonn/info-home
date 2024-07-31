@@ -98,6 +98,7 @@ async function handleReplyClick(row) {
   if (mode.value === 'reply') {
     let reply;
     try {
+      console.log("try to reply");
       const response = await fetch('https://info.myron-moshui.online/openai/getReply', {
         method: 'POST',
         headers: {
@@ -113,11 +114,7 @@ async function handleReplyClick(row) {
         // 生成回复链接并跳转
         if (isPhone.value) {
         // 在移动设备上，复制回复到剪贴板
-          console.log("ddd");
           await navigator.clipboard.writeText(reply)
-          
-          // 跳转到原始推文
-          openLink(getTweetUrl(row))
         } else {
           // 在桌面设备上，打开回复页面
           const replyText = encodeURIComponent(reply)
@@ -215,7 +212,7 @@ onMounted(() => {
       <el-table fit :data="rows" @sort-change="updateSortData">
         <el-table-column prop="text" label="Content" :width="columnsWidth.text">
           <template v-slot:default="table">
-            <a v-if="mode === 'normal'" :href="getTweetUrl(table.row)" target="_blank">
+            <a v-if="isPhone || mode === 'normal'" :href="getTweetUrl(table.row)" target="_blank">
               <p :class="contentClass">{{ table.row.text }}</p>
             </a>
             <div v-else @click="handleReplyClick(table.row)" class="cursor-pointer">
@@ -223,7 +220,16 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="createAt" label="Time" :width="columnsWidth.createAt" sortable="custom"></el-table-column>
+        <el-table-column prop="createAt" label="Time" :width="columnsWidth.createAt" sortable="custom">
+          <template v-slot:default="table">
+            <div v-if="isPhone" @click="handleReplyClick(table.row)" class="cursor-pointer">
+              <p :class="contentClass">{{ table.row.createAt }}</p>
+            </div>
+            <div v-else>
+              <p :class="contentClass">{{ table.row.createAt }}</p>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
 
       <div class="flex place-content-center px-3 py-3.5 dark:border-gray-700">
